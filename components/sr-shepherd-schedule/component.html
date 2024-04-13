@@ -28,6 +28,15 @@
                 opacity: 0.8;
                 font-size: 1.3em;
             }
+
+            .thlSolid, .thlDashed, .thlDotted {
+                border-radius: 0.5em;
+                border-width: 3px;
+                padding-block: calc(0.25em - 3px);
+            }
+            .thlSolid  { border-style: solid; }
+            .thlDashed { border-style: dashed; }
+            .thlDotted { border-style: dotted; }
         </style>
 
         <table>
@@ -47,7 +56,11 @@
                     <template repeat="{{ arena in arenasList }}">
                         <td style="width: 0.1em;"></td>
                         <template repeat="{{ team in match.arenas[arena].teams }}">
-                            <td style="color: {{ locations[teams[team].location.name].shepherds.colour }}">{{ team || '—' }}</td>
+                            <td class="{{ teamHighlight[team] }}"
+                                style="color: {{ locations[teams[team].location.name].shepherds.colour }}"
+                                onclick="window.handleTeamClick('{{team}}')">
+                                {{ team || '—' }}
+                            </td>
                         </template>
                     </template>
                 </tr>
@@ -58,6 +71,17 @@
     <script src="../../node_modules/moment/moment.js"></script>
 
     <script>
+        const nextHighlight = (currentHighlight) => {
+            switch (currentHighlight) {
+                case undefined:
+                default:
+                case '':          return 'thlSolid';
+                case 'thlSolid':  return 'thlDashed';
+                case 'thlDashed': return 'thlDotted';
+                case 'thlDotted': return '';
+            }
+        };
+
         Polymer({
             comp: null,
             arenas: undefined,
@@ -65,10 +89,15 @@
             numCorners: undefined,
             locations: undefined,
             teams: undefined,
+            teamHighlight: {},
             back: 1,
             forward: 7,
             schedule: {},
+            handleTeamClick: function(tla) {
+                this.teamHighlight[tla] = nextHighlight(this.teamHighlight[tla]);
+            },
             ready: function() {
+                window.handleTeamClick = (tla) => this.handleTeamClick(tla);
                 setInterval(this._updateDisplayedTimes.bind(this), 5000);
             },
             _getEarliest: function(a, b) {
