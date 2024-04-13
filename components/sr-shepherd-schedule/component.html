@@ -41,7 +41,12 @@
 
         <table>
             <tr>
-                <th></th>
+                <th>
+                    <button onclick="window.clearTeamHighlights()"
+                            style="font-size: inherit; border: none; background: none; color: blue; width: 100%;">
+                        ⎚
+                    </button>
+                </th>
                 <th>Staging Closes</th>
                 <template repeat="{{ arena in arenasList }}">
                     <th></th>
@@ -93,10 +98,14 @@
             back: 1,
             forward: 7,
             schedule: {},
+            clearTeamHighlights: function() {
+                this.teamHighlight = {};
+            },
             handleTeamClick: function(tla) {
                 this.teamHighlight[tla] = nextHighlight(this.teamHighlight[tla]);
             },
             ready: function() {
+                window.clearTeamHighlights = this.clearTeamHighlights.bind(this);
                 window.handleTeamClick = (tla) => this.handleTeamClick(tla);
                 setInterval(this._updateDisplayedTimes.bind(this), 5000);
             },
